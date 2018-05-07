@@ -15,13 +15,13 @@ public class UserViewModel extends ViewModel {
         this.userRepository = userRepository;
     }
 
-    public void login(String email, String password) {
-        this.user = this.userRepository.login(email, password);
-    }
-
-    public LiveData<User> getUser() {
-        return user;
-    }
+//    public void login(String email, String password) {
+//        this.user = this.userRepository.login(email, password);
+//    }
+//
+//    public LiveData<User> getUser() {
+//        return user;
+//    }
 
 //
 }

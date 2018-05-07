@@ -11,8 +11,8 @@ class ForgotPasswordFragment : Fragment() {
     companion object {
         val TAG = ForgotPasswordFragment::class.java.simpleName
     }
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view: View = inflater!!.inflate(R.layout.forgot_password_fragment, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view: View = inflater.inflate(R.layout.forgot_password_fragment, container, false)
         initViews(view)
         return view
     }

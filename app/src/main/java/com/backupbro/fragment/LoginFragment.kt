@@ -17,6 +17,12 @@ import com.backupbro.network.UserService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import io.reactivex.schedulers.Schedulers
+//import rx.android.schedulers.AndroidSchedulers
+import com.basgeekball.awesomevalidation.AwesomeValidation
+import com.basgeekball.awesomevalidation.ValidationStyle
+import io.reactivex.android.schedulers.AndroidSchedulers
+
 
 class LoginFragment : Fragment() {
 
@@ -39,11 +45,25 @@ class LoginFragment : Fragment() {
     @BindView(R.id.login_input_password)
     lateinit var passwordInputText: EditText
 
-    private var userService: UserService? = null
+    lateinit var userService: UserService
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    lateinit var validator: AwesomeValidation
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
         userService = RetrofitInstance.getRetrofitInstance().create(UserService::class.java)
-        val view: View = inflater!!.inflate(R.layout.login_fragment, container, false)
+        initValidation()
+    }
+
+    private fun initValidation() {
+        validator = AwesomeValidation(ValidationStyle.BASIC)
+        val regexPassword = "^(([a-zA-Z]+\\d+)|(\\d+[a-zA-Z]+))[a-zA-Z0-9]*\$"
+        validator.addValidation(activity, R.id.login_input_email, android.util.Patterns.EMAIL_ADDRESS, R.string.error_invalid_email)
+        validator.addValidation(activity, R.id.login_input_password, regexPassword, R.string.error_invalid_password)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view: View = inflater.inflate(R.layout.login_fragment, container, false)
         ButterKnife.bind(this, view)
         initViews(view)
         return view
@@ -64,34 +84,35 @@ class LoginFragment : Fragment() {
     }
 
     private fun login() {
+        if (validator.validate()) {
+            handleLogin()
+        }
+    }
+
+    private fun handleLogin() {
         val user = User()
         user.email = emailInputText.text.toString()
         user.password = passwordInputText.text.toString()
-        val userModel = userService?.login(user)
-        userModel?.enqueue(object : Callback<User> {
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(activity.applicationContext, "Login Succeeded", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(activity.applicationContext, "Login Failed", Toast.LENGTH_LONG).show()
-                }
-            }
-
-            override fun onFailure(call: Call<User>, t: Throwable) {
-                Toast.makeText(activity.applicationContext, "Login Failed", Toast.LENGTH_LONG).show()
-            }
-        })
+        userService.login(user)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ user ->
+                 Toast.makeText(activity?.applicationContext, "Login Succeeded for" + user.username, Toast.LENGTH_LONG).show()
+            },
+            { error ->
+                Toast.makeText(activity?.applicationContext, "Login Failed " + error.message, Toast.LENGTH_LONG).show()
+            })
     }
 
     private fun resetPasswordPage() {
-        val fm = activity.supportFragmentManager.beginTransaction()
-        fm.replace(R.id.authentication_fragment, ForgotPasswordFragment(), ForgotPasswordFragment.TAG)
-        fm.commit()
+        val fm = activity?.supportFragmentManager?.beginTransaction()
+        fm?.replace(R.id.authentication_fragment, ForgotPasswordFragment(), ForgotPasswordFragment.TAG)
+        fm?.commit()
     }
 
     private fun registerPage() {
-        val fm = activity.supportFragmentManager.beginTransaction()
-        fm.replace(R.id.authentication_fragment, RegistrationFragment(), RegistrationFragment.TAG)
-        fm.commit()
+        val fm = activity?.supportFragmentManager?.beginTransaction()
+        fm?.replace(R.id.authentication_fragment, RegistrationFragment(), RegistrationFragment.TAG)
+        fm?.commit()
     }
 }

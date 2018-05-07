@@ -12,6 +12,7 @@
     <string name="signup_button">Sign Up</string>
     <string name="signup_page_button">Don\'t Have An Account? Click Here To Sign Up</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="error_invalid_username">Invalid username</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -25,4 +26,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
