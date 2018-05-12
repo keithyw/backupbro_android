@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import com.backupbro.R
 import com.backupbro.fragment.LoginFragment
 
+
 class AuthenticationActivity : AppCompatActivity() {
 
     private var loginFragment: LoginFragment? = null

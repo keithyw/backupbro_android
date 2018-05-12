@@ -11,17 +11,12 @@ import android.widget.Toast
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.backupbro.R
-import com.backupbro.model.User
-import com.backupbro.network.RetrofitInstance
-import com.backupbro.network.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.backupbro.model.UserViewModel
 import io.reactivex.schedulers.Schedulers
-//import rx.android.schedulers.AndroidSchedulers
 import com.basgeekball.awesomevalidation.AwesomeValidation
 import com.basgeekball.awesomevalidation.ValidationStyle
 import io.reactivex.android.schedulers.AndroidSchedulers
+import org.koin.android.architecture.ext.viewModel
 
 
 class LoginFragment : Fragment() {
@@ -45,13 +40,12 @@ class LoginFragment : Fragment() {
     @BindView(R.id.login_input_password)
     lateinit var passwordInputText: EditText
 
-    lateinit var userService: UserService
+    val userViewModel by viewModel<UserViewModel>()
 
-    lateinit var validator: AwesomeValidation
+    private lateinit var validator: AwesomeValidation
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        userService = RetrofitInstance.getRetrofitInstance().create(UserService::class.java)
         initValidation()
     }
 
@@ -90,18 +84,14 @@ class LoginFragment : Fragment() {
     }
 
     private fun handleLogin() {
-        val user = User()
-        user.email = emailInputText.text.toString()
-        user.password = passwordInputText.text.toString()
-        userService.login(user)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({ user ->
-                 Toast.makeText(activity?.applicationContext, "Login Succeeded for" + user.username, Toast.LENGTH_LONG).show()
-            },
-            { error ->
-                Toast.makeText(activity?.applicationContext, "Login Failed " + error.message, Toast.LENGTH_LONG).show()
-            })
+        userViewModel.login(emailInputText.text.toString(), passwordInputText.text.toString())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ user ->
+                    Toast.makeText(activity?.applicationContext, "Login Succeeded for" + user.username, Toast.LENGTH_LONG).show()
+                }, { error ->
+                    Toast.makeText(activity?.applicationContext, "Login Failed " + error.message, Toast.LENGTH_LONG).show()
+                })
     }
 
     private fun resetPasswordPage() {

@@ -11,16 +11,12 @@ import android.widget.Toast
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.backupbro.R
-import com.backupbro.model.User
-import com.backupbro.network.RetrofitInstance
-import com.backupbro.network.UserService
+import com.backupbro.model.UserViewModel
 import com.basgeekball.awesomevalidation.AwesomeValidation
 import com.basgeekball.awesomevalidation.ValidationStyle
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import org.koin.android.architecture.ext.viewModel
 
 class RegistrationFragment : Fragment() {
     companion object {
@@ -42,13 +38,12 @@ class RegistrationFragment : Fragment() {
     @BindView(R.id.registration_input_password)
     lateinit var passwordInputText: EditText
 
-    lateinit var userService: UserService
+    val userViewModel by viewModel<UserViewModel>()
 
     lateinit var validator: AwesomeValidation
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        userService = RetrofitInstance.getRetrofitInstance().create(UserService::class.java)
         initValidation()
     }
 
@@ -85,11 +80,7 @@ class RegistrationFragment : Fragment() {
     }
 
     private fun handleRegistration() {
-        val user = User()
-        user.email = emailInputText.text.toString()
-        user.username = usernameInputText.text.toString()
-        user.password = passwordInputText.text.toString()
-        userService.register(user)
+        userViewModel.register(emailInputText.text.toString(), passwordInputText.text.toString(), usernameInputText.text.toString())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ user ->

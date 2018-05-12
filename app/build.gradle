@@ -53,7 +53,10 @@ dependencies {
     kapt 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.basgeekball:awesome-validation:4.1'
+    implementation 'org.koin:koin-android:0.9.2'
+    implementation 'org.koin:koin-android-architecture:0.9.2'
 }
 repositories {
     mavenCentral()
+    jcenter()
 }
